@@ -8422,146 +8422,186 @@
 				local old_parent = options_canvas.Parent
 				options_canvas.Parent = nil
 
-				for _, row in next, cfg.option_instances do
-					row.button:Destroy()
-				end
+				local new_option_instances = {}
 
-				cfg.option_instances = {}
-
-				for _, option_data in next, refreshed_list do
+				for i, option_data in next, refreshed_list do
 					local option_value = type(option_data) == "table" and tostring(option_data.name) or tostring(option_data)
 					local option_image = type(option_data) == "table" and option_data.image or nil
 
-					local row_button = library:create("TextButton", {
-						Parent = options_canvas,
-						FontFace = library.font,
-						TextColor3 = themes.preset.text,
-						BorderColor3 = rgb(0, 0, 0),
-						Size = dim2(1, 0, 0, ui_tokens.control.dropdown_option_height),
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
-						Text = "",
-						ZIndex = 28,
-						AutoButtonColor = false,
-					})
+					local row
+					if cfg.option_instances[i] then
+						row = cfg.option_instances[i]
+						row.value = option_value
+						row.label.Text = option_value
 
-					local row_surface = library:create("Frame", {
-						Parent = row_button,
-						Name = "",
-						BorderColor3 = rgb(0, 0, 0),
-						Size = dim2(1, 0, 1, 0),
-						BorderSizePixel = 0,
-						BackgroundColor3 = themes.preset.section_surface,
-						ZIndex = 28
-					})
-					library:apply_theme_once(row_surface, "section_surface", "BackgroundColor3")
-					library:apply_corner(row_surface, ui_tokens.radius.sm)
-					local row_stroke = apply_surface_stroke(row_surface, "separator", 0.94, 1)
+						if option_image then
+							if not row.image_label then
+								row.image_label = library:create("ImageLabel", {
+									Parent = row.surface,
+									Name = "icon",
+									BackgroundTransparency = 1,
+									Position = dim2(0, 16, 0.5, -8),
+									Size = dim2(0, 16, 0, 16),
+									BorderSizePixel = 0,
+									ZIndex = 31,
+								})
+							end
+							row.image_label.Image = "rbxassetid://" .. (tostring(option_image):match("%d+") or tostring(option_image))
+							row.image_label.Visible = true
+							row.label.Position = dim2(0, 38, 0, 0)
+							row.label.Size = dim2(1, -48, 1, 0)
+						else
+							if row.image_label then
+								row.image_label.Visible = false
+							end
+							row.label.Position = dim2(0, 18, 0, 0)
+							row.label.Size = dim2(1, -28, 1, 0)
+						end
 
-					local row_fill = library:create("Frame", {
-						Parent = row_surface,
-						Name = "",
-						Size = dim2(1, 0, 1, 0),
-						BorderSizePixel = 0,
-						BackgroundColor3 = themes.preset.accent,
-						BackgroundTransparency = 1,
-						ZIndex = 30
-					})
-					library:apply_theme_once(row_fill, "accent", "BackgroundColor3")
-					library:apply_corner(row_fill, ui_tokens.radius.sm)
-
-					local row_accent_bar = library:create("Frame", {
-						Parent = row_surface,
-						Name = "",
-						Position = dim2(0, 8, 0.5, -6),
-						Size = dim2(0, 2, 0, 12),
-						BorderSizePixel = 0,
-						BackgroundColor3 = themes.preset.accent,
-						BackgroundTransparency = 1,
-						ZIndex = 31
-					})
-					library:apply_theme_once(row_accent_bar, "accent", "BackgroundColor3")
-					library:apply_corner(row_accent_bar, 999)
-
-					local text_offset = 18
-					if option_image then
-						local image_label = library:create("ImageLabel", {
-							Parent = row_surface,
-							Name = "icon",
+						row.button.Visible = true
+						update_option_visual(row, option_is_selected(row.value, flags[cfg.flag]))
+					else
+						local row_button = library:create("TextButton", {
+							Parent = options_canvas,
+							FontFace = library.font,
+							TextColor3 = themes.preset.text,
+							BorderColor3 = rgb(0, 0, 0),
+							Size = dim2(1, 0, 0, ui_tokens.control.dropdown_option_height),
 							BackgroundTransparency = 1,
-							Position = dim2(0, 16, 0.5, -8),
-							Size = dim2(0, 16, 0, 16),
-							Image = "rbxassetid://" .. (tostring(option_image):match("%d+") or tostring(option_image)),
 							BorderSizePixel = 0,
-							ZIndex = 31,
+							Text = "",
+							ZIndex = 28,
+							AutoButtonColor = false,
 						})
-						text_offset = 38
+
+						local row_surface = library:create("Frame", {
+							Parent = row_button,
+							Name = "",
+							BorderColor3 = rgb(0, 0, 0),
+							Size = dim2(1, 0, 1, 0),
+							BorderSizePixel = 0,
+							BackgroundColor3 = themes.preset.section_surface,
+							ZIndex = 28
+						})
+						library:apply_theme_once(row_surface, "section_surface", "BackgroundColor3")
+						library:apply_corner(row_surface, ui_tokens.radius.sm)
+						local row_stroke = apply_surface_stroke(row_surface, "separator", 0.94, 1)
+
+						local row_fill = library:create("Frame", {
+							Parent = row_surface,
+							Name = "",
+							Size = dim2(1, 0, 1, 0),
+							BorderSizePixel = 0,
+							BackgroundColor3 = themes.preset.accent,
+							BackgroundTransparency = 1,
+							ZIndex = 30
+						})
+						library:apply_theme_once(row_fill, "accent", "BackgroundColor3")
+						library:apply_corner(row_fill, ui_tokens.radius.sm)
+
+						local row_accent_bar = library:create("Frame", {
+							Parent = row_surface,
+							Name = "",
+							Position = dim2(0, 8, 0.5, -6),
+							Size = dim2(0, 2, 0, 12),
+							BorderSizePixel = 0,
+							BackgroundColor3 = themes.preset.accent,
+							BackgroundTransparency = 1,
+							ZIndex = 31
+						})
+						library:apply_theme_once(row_accent_bar, "accent", "BackgroundColor3")
+						library:apply_corner(row_accent_bar, 999)
+
+						local text_offset = 18
+						local image_label = nil
+						if option_image then
+							image_label = library:create("ImageLabel", {
+								Parent = row_surface,
+								Name = "icon",
+								BackgroundTransparency = 1,
+								Position = dim2(0, 16, 0.5, -8),
+								Size = dim2(0, 16, 0, 16),
+								Image = "rbxassetid://" .. (tostring(option_image):match("%d+") or tostring(option_image)),
+								BorderSizePixel = 0,
+								ZIndex = 31,
+							})
+							text_offset = 38
+						end
+
+						local row_label = library:create("TextLabel", {
+							Parent = row_surface,
+							FontFace = library.font,
+							TextColor3 = themes.preset.text,
+							BorderColor3 = rgb(0, 0, 0),
+							Text = option_value,
+							Name = "",
+							BackgroundTransparency = 1,
+							Position = dim2(0, text_offset, 0, 0),
+							Size = dim2(1, -(text_offset + 10), 1, 0),
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextYAlignment = Enum.TextYAlignment.Center,
+							BorderSizePixel = 0,
+							TextTruncate = Enum.TextTruncate.AtEnd,
+							TextSize = ui_tokens.font.label,
+							ZIndex = 31,
+							BackgroundColor3 = rgb(255, 255, 255)
+						})
+						library:apply_theme_once(row_label, "text", "TextColor3")
+
+						row = {
+							button = row_button,
+							surface = row_surface,
+							stroke = row_stroke,
+							fill = row_fill,
+							accent_bar = row_accent_bar,
+							label = row_label,
+							image_label = image_label,
+							value = option_value,
+							hovering = false
+						}
+
+						row_button.MouseEnter:Connect(function()
+							row.hovering = true
+							update_option_visual(row, option_is_selected(row.value, flags[cfg.flag]))
+						end)
+
+						row_button.MouseLeave:Connect(function()
+							row.hovering = false
+							update_option_visual(row, option_is_selected(row.value, flags[cfg.flag]))
+						end)
+
+						row_button.MouseButton1Down:Connect(function()
+							if cfg.multi then
+								local selected_items = {}
+								for _, item in next, cfg.multi_items do
+									insert(selected_items, item)
+								end
+
+								local selected_index = find(selected_items, row.value)
+								if selected_index then
+									remove(selected_items, selected_index)
+								else
+									insert(selected_items, row.value)
+								end
+
+								cfg.set(selected_items)
+							else
+								cfg.set(row.value)
+								cfg.set_visible(false)
+							end
+						end)
 					end
 
-					local row_label = library:create("TextLabel", {
-						Parent = row_surface,
-						FontFace = library.font,
-						TextColor3 = themes.preset.text,
-						BorderColor3 = rgb(0, 0, 0),
-						Text = option_value,
-						Name = "",
-						BackgroundTransparency = 1,
-						Position = dim2(0, text_offset, 0, 0),
-						Size = dim2(1, -(text_offset + 10), 1, 0),
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Center,
-						BorderSizePixel = 0,
-						TextTruncate = Enum.TextTruncate.AtEnd,
-						TextSize = ui_tokens.font.label,
-						ZIndex = 31,
-						BackgroundColor3 = rgb(255, 255, 255)
-					})
-					library:apply_theme_once(row_label, "text", "TextColor3")
-
-					local row = {
-						button = row_button,
-						surface = row_surface,
-						stroke = row_stroke,
-						fill = row_fill,
-						accent_bar = row_accent_bar,
-						label = row_label,
-						value = option_value,
-						hovering = false
-					}
-
-					row_button.MouseEnter:Connect(function()
-						row.hovering = true
-						update_option_visual(row, option_is_selected(row.value, flags[cfg.flag]))
-					end)
-
-					row_button.MouseLeave:Connect(function()
-						row.hovering = false
-						update_option_visual(row, option_is_selected(row.value, flags[cfg.flag]))
-					end)
-
-					row_button.MouseButton1Down:Connect(function()
-						if cfg.multi then
-							local selected_items = {}
-							for _, item in next, cfg.multi_items do
-								insert(selected_items, item)
-							end
-
-							local selected_index = find(selected_items, row.value)
-							if selected_index then
-								remove(selected_items, selected_index)
-							else
-								insert(selected_items, row.value)
-							end
-
-							cfg.set(selected_items)
-						else
-							cfg.set(row.value)
-							cfg.set_visible(false)
-						end
-					end)
-
-					insert(cfg.option_instances, row)
+					insert(new_option_instances, row)
 				end
+
+				-- Hide unused rows from previous list
+				for i = #refreshed_list + 1, #cfg.option_instances do
+					cfg.option_instances[i].button.Visible = false
+					insert(new_option_instances, cfg.option_instances[i])
+				end
+
+				cfg.option_instances = new_option_instances
 
 				-- Reattach the canvas to the UI hierarchy
 				options_canvas.Parent = old_parent
