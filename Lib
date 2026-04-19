@@ -8418,6 +8418,10 @@
 			end
 
 			function cfg:refresh_options(refreshed_list)
+				-- Detach the canvas from the UI hierarchy to prevent layout recalculation freezing
+				local old_parent = options_canvas.Parent
+				options_canvas.Parent = nil
+
 				for _, row in next, cfg.option_instances do
 					row.button:Destroy()
 				end
@@ -8558,6 +8562,9 @@
 
 					insert(cfg.option_instances, row)
 				end
+
+				-- Reattach the canvas to the UI hierarchy
+				options_canvas.Parent = old_parent
 			end
 
 			if search_box then
