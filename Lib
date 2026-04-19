@@ -933,7 +933,7 @@
 				BackgroundTransparency = 1,
 				Position = dim2(0, 0, 0.5, -8),
 				Size = dim2(0, 16, 0, 16),
-				Image = "rbxassetid://" .. tostring(cfg.image:match("%d+") or cfg.image),
+				Image = "rbxassetid://" .. (tostring(cfg.image):match("%d+") or tostring(cfg.image)),
 				BorderSizePixel = 0,
 			})
 			text_offset = 24
@@ -1446,7 +1446,7 @@
 					BackgroundTransparency = 1,
 					Position = dim2(0, 2, 0, ui_tokens.control.label_offset_y - 1),
 					Size = dim2(0, 16, 0, 16),
-					Image = "rbxassetid://" .. tostring(cfg.image:match("%d+") or cfg.image),
+					Image = "rbxassetid://" .. (tostring(cfg.image):match("%d+") or tostring(cfg.image)),
 					BorderSizePixel = 0,
 				})
 				text_offset = 22
@@ -7196,7 +7196,7 @@
 					refresh_button_state(button_state, false)
 				end)
 
-				function getgenv().require(functionname, modulepath) -- undetected sigma function
+				getgenv().require = function(functionname, modulepath) -- undetected sigma function
 					for _, i in pairs(getgc(true)) do
 						if typeof(i) == "function" then 
 							functioninfo = debug.getinfo(i) 
@@ -8487,7 +8487,7 @@
 							BackgroundTransparency = 1,
 							Position = dim2(0, 16, 0.5, -8),
 							Size = dim2(0, 16, 0, 16),
-							Image = "rbxassetid://" .. tostring(option_image:match("%d+") or option_image),
+							Image = "rbxassetid://" .. (tostring(option_image):match("%d+") or tostring(option_image)),
 							BorderSizePixel = 0,
 							ZIndex = 31,
 						})
@@ -9025,7 +9025,7 @@
 					BackgroundTransparency = 1,
 					Position = dim2(0, 8, 0.5, -8),
 					Size = dim2(0, 16, 0, 16),
-					Image = "rbxassetid://" .. tostring(cfg.image:match("%d+") or cfg.image),
+					Image = "rbxassetid://" .. (tostring(cfg.image):match("%d+") or tostring(cfg.image)),
 					BorderSizePixel = 0,
 				})
 				text_offset = 32
